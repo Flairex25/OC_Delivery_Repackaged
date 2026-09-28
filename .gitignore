@@ -1,0 +1,12 @@
+# Project place file
+/OC_Delivery_Repackaged.rbxlx
+
+# Roblox Studio lock files
+/*.rbxlx.lock
+/*.rbxl.lock
+
+#Packages
+Packages/
+serverPackages/
+sourcemap.json
+wally.lock
