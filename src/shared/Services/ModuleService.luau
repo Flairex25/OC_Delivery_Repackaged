@@ -13,13 +13,11 @@ export type ClientModule = {
 	Start: (...any?) -> number | nil,
 	RenderStepped: (deltaTime: number) -> number | nil,
 	Heartbeat: (deltaTime: number) -> number | nil,
-	InputBegan: (input: InputObject) -> number | nil,
-	InputEnded: (input: InputObject) -> number | nil,
-	InputChanged: (input: InputObject) -> number | nil,
+	InputBegan: (input: InputObject, gameProcessedEvent: boolean) -> number | nil,
+	InputEnded: (input: InputObject, gameProcessedEvent: boolean) -> number | nil,
+	InputChanged: (input: InputObject, gameProcessedEvent: boolean) -> number | nil,
 	SceneBegin: (sceneID: string) -> number | nil,
 	SceneEnded: (sceneID: string) -> number | nil,
-	PlayerAdded: (...any?) -> number | nil,
-	CharacterAdded: (character: Model) -> number | nil,
 	[string]: (...any?) -> ...any?,
 	----------------------------------
 }
@@ -29,7 +27,7 @@ export type ServerModule = {
 	params: ModuleParams,
 	----------------------------------
 	Init: (...any?) -> number?,
-	Start: (...any?) -> number?,
+	Start: (param1: Player? | PlayerGui? | any?, param2: Model? | any?) -> number?,
 	PlayerAdded: (...any?) -> number?,
 	CharacterAdded: (character: Model) -> number?,
 	[string]: (...any?) -> ...any?,
@@ -48,6 +46,8 @@ export type ModuleParams = {
 	isClass: boolean?,
 	className: string?,
 	isSubmodule: boolean?,
+	waitForPlayerLoaded: boolean?,
+	waitForCharacterLoaded: boolean?,
 	-----------------------
 }
 ---------------------------------------------------------------------------------------
