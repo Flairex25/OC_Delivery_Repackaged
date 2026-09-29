@@ -1,6 +1,7 @@
 ----!strict
 -------------------------------------------------------------------------------------------------------------------------------
 const shared = game:GetService("ReplicatedStorage").Shared
+const client = script
 -------------------------------------------------------------------------------------------------------------------------------
 --Classes
 --const Signal = require(shared.Classes.Signal)
@@ -100,11 +101,14 @@ const function ProcessModuleFunctionPCall(
 	errorMsg: string,
 	functionNameOverride: string?
 )
+	if not module.params.debug then
+		return
+	end
 	if success then
 		table.insert(moduleList, module)
 		if not module.params.verboseDebug then
 			--Standard Debug Message
-			print(functionName, module.params.debugPrefix)
+			print((functionNameOverride and functionNameOverride or functionName), module.params.debugPrefix)
 		else
 			--Verbose Debug Message
 			print(
@@ -157,6 +161,12 @@ const function AddModulesToList(moduleScript: ModuleScript)
 		if not module.params.isClass then
 			module.params.className = nil
 		end
+		if not module.params.waitForPlayerLoaded then
+			module.params.waitForPlayerLoaded = false
+		end
+		if not module.params.waitForCharacterLoaded then
+			module.params.waitForCharacterLoaded = false
+		end
 	end)
 	--
 	ProcessModuleFunctionPCall(module, "require", success, errorMsg, "Required")
@@ -166,7 +176,7 @@ const function AddModulesToList(moduleScript: ModuleScript)
 	end
 	---------------------------------------------------
 	--Add methods
-	if module.Init then
+	if module.Init and module.params.enabled then
 		local initSuccess, initErrorMsg = pcall(function()
 			const returnCode = module.Init()
 			ProcessReturnCode(module, returnCode, "Init")
@@ -208,7 +218,7 @@ const function AddModulesToList(moduleScript: ModuleScript)
 end
 -------------------------------------------------------------------------------------------------------------------------------
 --Add Modules
-for _, moduleScript in ipairs(shared.Modules:GetDescendants()) do
+for _, moduleScript in ipairs(client:GetDescendants()) do
 	if moduleScript:IsA("ModuleScript") then
 		coroutine.wrap(function()
 			AddModulesToList(moduleScript)
@@ -218,6 +228,10 @@ end
 -------------------------------------------------------------------------------------------------------------------------------
 --Start
 const function StartModule(module: ModuleService.ClientModule)
+	--
+	if not module.params.enabled then
+		return
+	end
 	--
 	local player: Player | nil
 	local character: Model | nil
@@ -252,12 +266,17 @@ end
 -------------------------------------------------------------------------------------------------------------------------------
 --RenderStepped
 const function RenderSteppedModule(module: ModuleService.ClientModule, deltaTime: number)
-	local success, errorMsg = pcall(function()
+	--
+	if not module.params.enabled then
+		return
+	end
+	--
+	local _success, _errorMsg = pcall(function()
 		const returnCode = module.RenderStepped(deltaTime)
 		ProcessReturnCode(module, returnCode, "RenderStepped")
 	end)
 	--
-	ProcessModuleFunctionPCall(module, "run RenderStepped", success, errorMsg, "Ran RenderStepped")
+	--ProcessModuleFunctionPCall(module, "run RenderStepped", success, errorMsg, "Ran RenderStepped")
 end
 --
 RunService.RenderStepped:Connect(function(deltaTime: number)
@@ -270,12 +289,17 @@ end)
 -------------------------------------------------------------------------------------------------------------------------------
 --Heartbeat
 const function HeartbeatModule(module: ModuleService.ClientModule, deltaTime: number)
-	local success, errorMsg = pcall(function()
+	--
+	if not module.params.enabled then
+		return
+	end
+	--
+	local _success, _errorMsg = pcall(function()
 		const returnCode = module.Heartbeat(deltaTime)
 		ProcessReturnCode(module, returnCode, "Heartbeat")
 	end)
 	--
-	ProcessModuleFunctionPCall(module, "run Heartbeat", success, errorMsg, "Ran Heartbeat")
+	--ProcessModuleFunctionPCall(module, "run Heartbeat", success, errorMsg, "Ran Heartbeat")
 end
 --
 RunService.Heartbeat:Connect(function(deltaTime: number)
@@ -288,6 +312,11 @@ end)
 -------------------------------------------------------------------------------------------------------------------------------
 --InputBegan
 const function InputBeganModule(module: ModuleService.ClientModule, input: InputObject, gameProcessedEvent: boolean)
+	--
+	if not module.params.enabled then
+		return
+	end
+	--
 	local success, errorMsg = pcall(function()
 		const returnCode = module.InputBegan(input, gameProcessedEvent)
 		ProcessReturnCode(module, returnCode, "InputBegan")
@@ -306,6 +335,11 @@ end)
 -------------------------------------------------------------------------------------------------------------------------------
 --InputEnded
 const function InputEndedModule(module: ModuleService.ClientModule, input: InputObject, gameProcessedEvent: boolean)
+	--
+	if not module.params.enabled then
+		return
+	end
+	--
 	local success, errorMsg = pcall(function()
 		const returnCode = module.InputEnded(input, gameProcessedEvent)
 		ProcessReturnCode(module, returnCode, "InputEnded")
@@ -324,6 +358,11 @@ end)
 -------------------------------------------------------------------------------------------------------------------------------
 --InputChanged
 const function InputChangedModule(module: ModuleService.ClientModule, input: InputObject, gameProcessedEvent: boolean)
+	--
+	if not module.params.enabled then
+		return
+	end
+	--
 	local success, errorMsg = pcall(function()
 		const returnCode = module.InputChanged(input, gameProcessedEvent)
 		ProcessReturnCode(module, returnCode, "InputChanged")

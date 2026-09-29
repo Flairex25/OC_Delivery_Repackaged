@@ -10,7 +10,7 @@ export type ClientModule = {
 	params: ModuleParams,
 	-----------------------------------
 	Init: (...any?) -> number | nil,
-	Start: (...any?) -> number | nil,
+	Start: (param1: (Player | PlayerGui | any)?, param2: (Model | any)?) -> number | nil,
 	RenderStepped: (deltaTime: number) -> number | nil,
 	Heartbeat: (deltaTime: number) -> number | nil,
 	InputBegan: (input: InputObject, gameProcessedEvent: boolean) -> number | nil,
@@ -27,7 +27,7 @@ export type ServerModule = {
 	params: ModuleParams,
 	----------------------------------
 	Init: (...any?) -> number?,
-	Start: (param1: Player? | PlayerGui? | any?, param2: Model? | any?) -> number?,
+	Start: (...any?) -> number?,
 	PlayerAdded: (...any?) -> number?,
 	CharacterAdded: (character: Model) -> number?,
 	[string]: (...any?) -> ...any?,
