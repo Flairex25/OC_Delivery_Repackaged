@@ -8,7 +8,7 @@ const shared = game:GetService("ReplicatedStorage").Shared
 --Services
 const ModuleService = require(shared.Services.ModuleService)
 -------------------------------------------------------------------------------------------------------------------------------
-local module = {} :: ModuleService.ClientModule
+local module = {} :: ModuleService.ServerModule
 -------------------------------------------------------------------------------------------------------------------------------
 module.params = {
 	--["enabled"] = false, -- If false, the script is required but no functions are ran (Default: true)

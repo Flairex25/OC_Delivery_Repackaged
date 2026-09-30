@@ -121,50 +121,20 @@ end
 Matrix.__tostring = function(self:Matrix): string
     local result = ""
     for y = 1, self.SizeY, 1 do
-        result += "\n["
+        result = result .. "\n["
         for x = 1, self.SizeX, 1 do
-            result += tostring(self.Data[y][x])
+            result = result .. tostring(self.Data[y][x])
             if x < self.SizeX then
-                result += ", "
+                result = result .. ", "
             end
         end
-        result += "]\n"
+        result = result .. "]"
     end
-    return result
+    return result .. "\n"
 end
 ---
 Matrix.__add = function(self:Matrix, other:Matrix): Matrix
-    if typeof(other) ~= "number" then
-        if self.SizeX ~= other.SizeX then
-            error("Cannot add Matrices because X sizes " .. self.SizeX .. " and " .. other.SizeX .. " do not match!")
-            return self
-        end
-        if self.SizeY ~= other.SizeY then
-            error(
-                "Cannot add Matrices because Y sizes " 
-                .. self.SizeY 
-                .. " and " 
-                .. other.SizeY 
-                .. " do not match!"
-            )
-            return self
-        end
-    end
-    local newMatrix = Constructor(self.SizeX, self.SizeY)
-    for y = 1, newMatrix.SizeY, 1 do
-        for x = 1, newMatrix.SizeX, 1 do
-            if typeof(other) == "number" then
-                newMatrix.Data[y][x] = self.Data[y][x] + other
-            else
-                newMatrix.Data[y][x] = self.Data[y][x] + other.Data[y][x]
-            end
-        end
-    end
-    return newMatrix
-end
---
-Matrix.__sub = function(self:Matrix, other:Matrix|number): Matrix
-    if typeof(other) ~= "number" then
+    if typeof(self) ~= "number" and typeof(other) ~= "number" then
         if self.SizeX ~= other.SizeX then
             error(
                 "Cannot subtract Matrices because X sizes " 
@@ -185,25 +155,93 @@ Matrix.__sub = function(self:Matrix, other:Matrix|number): Matrix
             )
             return self
         end
-    end
-    local newMatrix = Constructor(self.SizeX, self.SizeY)
-    for y = 1, newMatrix.SizeY, 1 do
-        for x = 1, newMatrix.SizeX, 1 do
-            if typeof(other) == "number" then
-                newMatrix.Data[y][x] = self.Data[y][x] - other
-            else
-                newMatrix.Data[y][x] = self.Data[y][x] - other.Data[y][x]
+        local newMatrix = Constructor(self.SizeX, self.SizeY)
+        for y = 1, newMatrix.SizeY, 1 do
+            for x = 1, newMatrix.SizeX, 1 do
+                newMatrix.Data[y][x] = self.Data[y][x] + other[y][x]
             end
         end
+        return newMatrix
+    elseif typeof(self) ~= "number" and typeof(other) == "number" then
+        local newMatrix = Constructor(self.SizeX, self.SizeY)
+        for y = 1, newMatrix.SizeY, 1 do
+            for x = 1, newMatrix.SizeX, 1 do
+                newMatrix.Data[y][x] = self.Data[y][x] + other
+            end
+        end
+        return newMatrix
+    elseif typeof(self) == "number" and typeof(other) ~= "number" then
+        local otherMatrix = other :: Matrix
+        local newMatrix = Constructor(other.SizeX, other.SizeY)
+        for y = 1, newMatrix.SizeY, 1 do
+            for x = 1, newMatrix.SizeX, 1 do
+                newMatrix.Data[y][x] = self + otherMatrix.Data[y][x]
+            end
+        end
+        return newMatrix
+    else
+        --This will never run lmao
+        return Constructor()
     end
-    return newMatrix
+end
+--
+Matrix.__sub = function(self:Matrix|number, other:Matrix|number): Matrix
+    if typeof(self) ~= "number" and typeof(other) ~= "number" then
+        if self.SizeX ~= other.SizeX then
+            error(
+                "Cannot subtract Matrices because X sizes " 
+                .. self.SizeX 
+                .. " and " 
+                .. other.SizeX 
+                .. " do not match!"
+            )
+            return self
+        end
+        if self.SizeY ~= other.SizeY then
+            error(
+                "Cannot subtract Matrices because Y sizes " 
+                .. self.SizeY 
+                .. " and " 
+                .. other.SizeY 
+                .. " do not match!"
+            )
+            return self
+        end
+        local newMatrix = Constructor(self.SizeX, self.SizeY)
+        for y = 1, newMatrix.SizeY, 1 do
+            for x = 1, newMatrix.SizeX, 1 do
+                newMatrix.Data[y][x] = self.Data[y][x] - other[y][x]
+            end
+        end
+        return newMatrix
+    elseif typeof(self) ~= "number" and typeof(other) == "number" then
+        local newMatrix = Constructor(self.SizeX, self.SizeY)
+        for y = 1, newMatrix.SizeY, 1 do
+            for x = 1, newMatrix.SizeX, 1 do
+                newMatrix.Data[y][x] = self.Data[y][x] - other
+            end
+        end
+        return newMatrix
+    elseif typeof(self) == "number" and typeof(other) ~= "number" then
+        local otherMatrix = other :: Matrix
+        local newMatrix = Constructor(other.SizeX, other.SizeY)
+        for y = 1, newMatrix.SizeY, 1 do
+            for x = 1, newMatrix.SizeX, 1 do
+                newMatrix.Data[y][x] = self - otherMatrix.Data[y][x]
+            end
+        end
+        return newMatrix
+    else
+        --This will never run lmao
+        return Constructor()
+    end
 end
 --
 const function dot(v1:{number},v2:{number}): number
     if #v1 == #v2 then
         local sum = 0
         for i = 1, #v1, 1 do
-            sum += v1[i] * v2[i]
+            sum = sum + v1[i] * v2[i]
         end
         return sum
     else
@@ -212,8 +250,8 @@ const function dot(v1:{number},v2:{number}): number
     end
 end
 --
-Matrix.__mul = function(self:Matrix, other:Matrix|number): Matrix
-    if typeof(other) == "number" then
+Matrix.__mul = function(self:Matrix|number, other:Matrix|number): Matrix
+    if typeof(other) == "number" and typeof(self) ~= "number" then
         local newMatrix = Constructor(self.SizeX, self.SizeY)
         for y = 1, newMatrix.SizeY, 1 do
             for x = 1, newMatrix.SizeX, 1 do
@@ -221,7 +259,15 @@ Matrix.__mul = function(self:Matrix, other:Matrix|number): Matrix
             end
         end
         return newMatrix
-    else
+    elseif typeof(self) == "number" and typeof(other) ~= "number" then
+        local newMatrix = Constructor(other.SizeX, other.SizeY)
+        for y = 1, newMatrix.SizeY, 1 do
+            for x = 1, newMatrix.SizeX, 1 do
+                newMatrix.Data[y][x] = other.Data[y][x] * self
+            end
+        end
+        return newMatrix
+    elseif typeof(self) ~= "number" and typeof(other) ~= "number" then
         if self.SizeX ~= other.SizeY then
             error(
                 "Cannot multply matrices because Matrix 1 X size " 
@@ -236,22 +282,30 @@ Matrix.__mul = function(self:Matrix, other:Matrix|number): Matrix
         for y = 1, newMatrix.SizeY, 1 do
             for x = 1, newMatrix.SizeX, 1 do
                 local row = self:ReadRow(y)
-                local collumn = self:ReadCollumn(x)
-                self.Data[y][x] = dot(row, collumn)
+                local collumn = other:ReadCollumn(x)
+                newMatrix.Data[y][x] = dot(row, collumn)
             end
         end
         return newMatrix
+    else
+        --This will never run so lmao
+        return Constructor()
     end
 end
 --
-Matrix.__div = function(self:Matrix, other:number): Matrix
-    local newMatrix = Constructor(self.SizeX, self.SizeY)
-    for y = 1, newMatrix.SizeY, 1 do
-        for x = 1, newMatrix.SizeX, 1 do
-            newMatrix.Data[y][x] = self.Data[y][x] * other
+Matrix.__div = function(self:Matrix, other:Matrix | number): Matrix
+    if typeof(other) == "number" then
+        local newMatrix = Constructor(self.SizeX, self.SizeY)
+        for y = 1, newMatrix.SizeY, 1 do
+            for x = 1, newMatrix.SizeX, 1 do
+                newMatrix.Data[y][x] = self.Data[y][x] / other
+            end
         end
+        return newMatrix
+    else
+        error("Cannot divid Matrix by another Matrix!")
+        return Constructor()
     end
-    return newMatrix
 end
 ---------------------------------------------------------------------------------------
 return Constructor

@@ -8,7 +8,7 @@ const Matrix = require(shared.Classes.Matrix)
 --Services
 const ModuleService = require(shared.Services.ModuleService)
 -------------------------------------------------------------------------------------------------------------------------------
-local module = {} :: ModuleService.ClientModule
+local module = {} :: ModuleService.ServerModule
 -------------------------------------------------------------------------------------------------------------------------------
 module.params = {
 	--["enabled"] = false, -- If false, the script is required but no functions are ran (Default: true)
@@ -40,12 +40,7 @@ function module.Start()
 	--
 	print(m1)
 	print(m2)
-	print(m1 + m2)
-	print(m1 + 10)
-	print(m1 - m2)
-	print(m1 - 10)
 	print(m1 * m2)
-	print(m1 * 10)
 	--
 	return -1
 end
