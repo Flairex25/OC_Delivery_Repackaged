@@ -32,11 +32,19 @@ function module.Start(_param1: (Player | PlayerGui | any)?, _param2: (Model | an
 	return -1
 end
 -------------------------------------------------------------------------------------------------------------------------------
-function module.RenderStepped(_deltaTime: number)
+function module.Heartbeat(_deltaTime: number)
 	return -1
 end
 -------------------------------------------------------------------------------------------------------------------------------
-function module.Heartbeat(_deltaTime: number)
+function module.PreRender(_deltaTime: number)
+	return -1
+end
+-------------------------------------------------------------------------------------------------------------------------------
+function module.PreSimulation(_deltaTime: number)
+	return -1
+end
+-------------------------------------------------------------------------------------------------------------------------------
+function module.PostSimulation(_deltaTime: number)
 	return -1
 end
 -------------------------------------------------------------------------------------------------------------------------------

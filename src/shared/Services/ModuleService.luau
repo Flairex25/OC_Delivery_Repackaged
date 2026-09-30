@@ -11,8 +11,10 @@ export type ClientModule = {
 	-----------------------------------
 	Init: (...any?) -> number | nil,
 	Start: (param1: (Player | PlayerGui | any)?, param2: (Model | any)?) -> number | nil,
-	RenderStepped: (deltaTime: number) -> number | nil,
 	Heartbeat: (deltaTime: number) -> number | nil,
+	PreRender: (deltaTime: number) -> number | nil,
+	PreSimulation: (deltaTime: number) -> number | nil,
+	PostSimulation: (deltaTime: number) -> number | nil,
 	InputBegan: (input: InputObject, gameProcessedEvent: boolean) -> number | nil,
 	InputEnded: (input: InputObject, gameProcessedEvent: boolean) -> number | nil,
 	InputChanged: (input: InputObject, gameProcessedEvent: boolean) -> number | nil,

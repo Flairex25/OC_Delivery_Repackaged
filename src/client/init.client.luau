@@ -14,8 +14,10 @@ const LoadingService = require(shared.Services.LoadingService)
 -------------------------------------------------------------------------------------------------------------------------------
 local moduleList = {} :: { ModuleService.ClientModule }
 local startList = {} :: { ModuleService.ClientModule }
-local renderSteppedList = {} :: { ModuleService.ClientModule }
 local heartbeatList = {} :: { ModuleService.ClientModule }
+local preRenderList = {} :: { ModuleService.ClientModule }
+local preSimulationList = {} :: { ModuleService.ClientModule }
+local postSimulationList = {} :: { ModuleService.ClientModule }
 local inputBeganList = {} :: { ModuleService.ClientModule }
 local inputEndedList = {} :: { ModuleService.ClientModule }
 local inputChangedList = {} :: { ModuleService.ClientModule }
@@ -187,11 +189,17 @@ const function AddModulesToList(moduleScript: ModuleScript)
 	if module.Start then
 		table.insert(startList, module)
 	end
-	if module.RenderStepped then
-		table.insert(renderSteppedList, module)
-	end
 	if module.Heartbeat then
 		table.insert(heartbeatList, module)
+	end
+	if module.PreRender then
+		table.insert(preRenderList, module)
+	end
+	if module.PreSimulation then
+		table.insert(preSimulationList, module)
+	end
+	if module.PostSimulation then
+		table.insert(postSimulationList, module)
 	end
 	if module.InputBegan then
 		table.insert(inputBeganList, module)
@@ -225,6 +233,16 @@ for _, moduleScript in ipairs(client:GetDescendants()) do
 		end)()
 	end
 end
+-------------------------------------------------------------------------------------------------------------------------------
+--Module Loop
+-- const function ModuleFunctionLoop(list: { ModuleService.ClientModule }, fn: (module:ModuleService.ClientModule,...any?)->(), ...:any?)
+-- 	local args = ...
+-- 	for _, module in ipairs(list) do
+-- 		coroutine.wrap(function()
+-- 			fn(module, args)
+-- 		end)()
+-- 	end
+-- end
 -------------------------------------------------------------------------------------------------------------------------------
 --Start
 const function StartModule(module: ModuleService.ClientModule)
@@ -264,29 +282,6 @@ for _, module in ipairs(startList) do
 	end)()
 end
 -------------------------------------------------------------------------------------------------------------------------------
---RenderStepped
-const function RenderSteppedModule(module: ModuleService.ClientModule, deltaTime: number)
-	--
-	if not module.params.enabled then
-		return
-	end
-	--
-	local _success, _errorMsg = pcall(function()
-		const returnCode = module.RenderStepped(deltaTime)
-		ProcessReturnCode(module, returnCode, "RenderStepped")
-	end)
-	--
-	--ProcessModuleFunctionPCall(module, "run RenderStepped", success, errorMsg, "Ran RenderStepped")
-end
---
-RunService.RenderStepped:Connect(function(deltaTime: number)
-	for _, module in ipairs(renderSteppedList) do
-		coroutine.wrap(function()
-			RenderSteppedModule(module, deltaTime)
-		end)()
-	end
-end)
--------------------------------------------------------------------------------------------------------------------------------
 --Heartbeat
 const function HeartbeatModule(module: ModuleService.ClientModule, deltaTime: number)
 	--
@@ -306,6 +301,75 @@ RunService.Heartbeat:Connect(function(deltaTime: number)
 	for _, module in ipairs(heartbeatList) do
 		coroutine.wrap(function()
 			HeartbeatModule(module, deltaTime)
+		end)()
+	end
+end)
+-------------------------------------------------------------------------------------------------------------------------------
+--PreRender
+const function PreRenderModule(module: ModuleService.ClientModule, deltaTime: number)
+	--
+	if not module.params.enabled then
+		return
+	end
+	--
+	local _success, _errorMsg = pcall(function()
+		const returnCode = module.PreRender(deltaTime)
+		ProcessReturnCode(module, returnCode, "PreRender")
+	end)
+	--
+	--ProcessModuleFunctionPCall(module, "run PreRender", success, errorMsg, "Ran PreRender")
+end
+--
+RunService.PreRender:Connect(function(deltaTime: number)
+	for _, module in ipairs(preRenderList) do
+		coroutine.wrap(function()
+			PreRenderModule(module, deltaTime)
+		end)()
+	end
+end)
+-------------------------------------------------------------------------------------------------------------------------------
+--PreSimulation
+const function PreSimulationModule(module: ModuleService.ClientModule, deltaTime: number)
+	--
+	if not module.params.enabled then
+		return
+	end
+	--
+	local _success, _errorMsg = pcall(function()
+		const returnCode = module.PreSimulation(deltaTime)
+		ProcessReturnCode(module, returnCode, "PreSimulation")
+	end)
+	--
+	--ProcessModuleFunctionPCall(module, "run PreSimulation", success, errorMsg, "Ran PreSimulation")
+end
+--
+RunService.PreSimulation:Connect(function(deltaTime: number)
+	for _, module in ipairs(preSimulationList) do
+		coroutine.wrap(function()
+			PreSimulationModule(module, deltaTime)
+		end)()
+	end
+end)
+-------------------------------------------------------------------------------------------------------------------------------
+--PostSimulation
+const function PostSimulationModule(module: ModuleService.ClientModule, deltaTime: number)
+	--
+	if not module.params.enabled then
+		return
+	end
+	--
+	local _success, _errorMsg = pcall(function()
+		const returnCode = module.PostSimulation(deltaTime)
+		ProcessReturnCode(module, returnCode, "PostSimulation")
+	end)
+	--
+	--ProcessModuleFunctionPCall(module, "run PostSimulation", success, errorMsg, "Ran PostSimulation")
+end
+--
+RunService.PostSimulation:Connect(function(deltaTime: number)
+	for _, module in ipairs(postSimulationList) do
+		coroutine.wrap(function()
+			PostSimulationModule(module, deltaTime)
 		end)()
 	end
 end)
