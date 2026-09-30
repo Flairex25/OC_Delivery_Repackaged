@@ -7,10 +7,7 @@ const server = script
 --const Signal = require(shared.Classes.Signal)
 -------------------------------------------------------------------------------------------------------------------------------
 --Services
-const RunService = game:GetService("RunService")
-const UserInputService = game:GetService("UserInputService")
 const ModuleService = require(shared.Services.ModuleService)
-const LoadingService = require(shared.Services.LoadingService)
 -------------------------------------------------------------------------------------------------------------------------------
 local moduleList = {} :: { ModuleService.ServerModule }
 local startList = {} :: { ModuleService.ServerModule }
