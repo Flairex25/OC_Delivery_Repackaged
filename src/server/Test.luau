@@ -27,16 +27,15 @@ function module.Init()
 end
 -------------------------------------------------------------------------------------------------------------------------------
 function module.Start()
-	local m1 = Matrix(3,3)
-	local m2 = Matrix(3,3)
+	local m1 = Matrix(2, 3)
+	m1:SetRow(1, { 1, 2, 3 })
+	m1:SetRow(2, { 4, 5, 6 })
+	m1:SetRow(3, { 7, 8, 9 })
 	--
-	m1:WriteRow({1,2,3}, 1)
-	m1:WriteRow({4,5,6}, 2)
-	m1:WriteRow({7,8,9}, 3)
-	--
-	m2:WriteRow({9,8,7}, 1)
-	m2:WriteRow({6,5,4}, 2)
-	m2:WriteRow({3,2,1}, 3)
+	local m2 = Matrix(3, 2)
+	m2:SetRow(1, { 9, 8, 7 })
+	m2:SetRow(2, { 6, 5, 4 })
+	m2:SetRow(3, { 3, 2, 1 })
 	--
 	print(m1)
 	print(m2)
