@@ -165,7 +165,7 @@ Matrix.__add = function(self: Matrix | number, other: Matrix | number): Matrix |
 		return result
 	elseif typeof(self) ~= "number" and typeof(other) ~= "number" then
 		if (self.SizeX ~= other.SizeX) or (self.SizeY ~= other.SizeY) then
-			error("Invalid operands for addition: Matrices must have the same dimensions.")
+			warn("Invalid operands for addition: Matrices must have the same dimensions.")
 			return nil
 		end
 		--
@@ -175,7 +175,8 @@ Matrix.__add = function(self: Matrix | number, other: Matrix | number): Matrix |
 		end)
 		return result
 	else
-		error("Invalid operands for addition: " .. typeof(self) .. " and " .. typeof(other) .. ".")
+		warn("Invalid operands for addition: " .. typeof(self) .. " and " .. typeof(other) .. ".")
+		return nil
 	end
 end
 ---------------------------------------------------------------------------------------
@@ -196,7 +197,7 @@ Matrix.__sub = function(self: Matrix | number, other: Matrix | number): Matrix |
 	elseif typeof(self) ~= "number" and typeof(other) ~= "number" then
 		--
 		if (self.SizeX ~= other.SizeX) or (self.SizeY ~= other.SizeY) then
-			error("Invalid operands for subtraction: Matrices must have the same dimensions.")
+			warn("Invalid operands for subtraction: Matrices must have the same dimensions.")
 			return nil
 		end
 		--
@@ -206,7 +207,8 @@ Matrix.__sub = function(self: Matrix | number, other: Matrix | number): Matrix |
 		end)
 		return result
 	else
-		error("Invalid operands for subtraction: " .. typeof(self) .. " and " .. typeof(other) .. ".")
+		warn("Invalid operands for subtraction: " .. typeof(self) .. " and " .. typeof(other) .. ".")
+		return nil
 	end
 end
 ---------------------------------------------------------------------------------------
@@ -227,7 +229,7 @@ Matrix.__mul = function(self: Matrix | number, other: Matrix | number): Matrix |
 	elseif typeof(self) ~= "number" and typeof(other) ~= "number" then
 		--
 		if self.SizeX ~= other.SizeY then
-			error("Invalid operands for multiply: Matrix A's SizeX must equal Matrix B's SizeY.")
+			warn("Invalid operands for multiply: Matrix A's SizeX must equal Matrix B's SizeY.")
 			return nil
 		end
 		--
@@ -237,7 +239,8 @@ Matrix.__mul = function(self: Matrix | number, other: Matrix | number): Matrix |
 		end)
 		return result
 	else
-		error("Invalid operands for multiply: " .. typeof(self) .. " and " .. typeof(other) .. ".")
+		warn("Invalid operands for multiply: " .. typeof(self) .. " and " .. typeof(other) .. ".")
+		return nil
 	end
 end
 ---------------------------------------------------------------------------------------
@@ -257,11 +260,12 @@ Matrix.__div = function(self: Matrix | number, other: Matrix | number): Matrix |
 		return result
 	elseif typeof(self) ~= "number" and typeof(other) ~= "number" then
 		--
-		error("Cannot divide two matrices.")
+		warn("Cannot divide two matrices.")
 		return nil
 		--
 	else
-		error("Invalid operands for divide: " .. typeof(self) .. " and " .. typeof(other) .. ".")
+		warn("Invalid operands for divide: " .. typeof(self) .. " and " .. typeof(other) .. ".")
+		return nil
 	end
 end
 ---------------------------------------------------------------------------------------
