@@ -1,8 +1,9 @@
-----!strict
+--!strict
 -------------------------------------------------------------------------------------------------------------------------------
 const shared = game:GetService("ReplicatedStorage").Shared
 -------------------------------------------------------------------------------------------------------------------------------
 --Classes
+const Stack = require(shared.Classes.Stack)
 const Matrix = require(shared.Classes.Matrix)
 -------------------------------------------------------------------------------------------------------------------------------
 --Services
@@ -27,6 +28,18 @@ function module.Init()
 end
 -------------------------------------------------------------------------------------------------------------------------------
 function module.Start()
+	--
+	local newStack = Stack() :: Stack.Stack<Matrix.Matrix>
+	--
+	newStack:Push(Matrix(1,3))
+	newStack:Push(Matrix(2,3))
+	newStack:Push(Matrix(3,3))
+	--
+	while not newStack:IsEmpty() do
+		print(newStack:Peek())
+		newStack:Pop()
+	end
+	--
 	return -1
 end
 -------------------------------------------------------------------------------------------------------------------------------
