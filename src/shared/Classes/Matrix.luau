@@ -1,4 +1,4 @@
---!nonstrict
+--!nocheck
 ---------------------------------------------------------------------------------------
 --local shared = game:GetService("ReplicatedStorage").Shared
 ---------------------------------------------------------------------------------------
@@ -13,9 +13,9 @@ export type Matrix = {
 	Type: "Matrix",
 	-------------------
 	--Private
-	SizeX: number,
-	SizeY: number,
-	Data: { { number } },
+	--SizeX: number,
+	--SizeY: number,
+	--Data: { { number } },
 	-------------------
 	--Public
 	GetSizeX: (self: Matrix) -> number,
