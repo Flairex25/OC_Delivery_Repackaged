@@ -4,7 +4,7 @@ const shared = game:GetService("ReplicatedStorage").Shared
 -------------------------------------------------------------------------------------------------------------------------------
 --Classes
 --const Class = require(shared.Classes.Class)
-const Array = require(shared.Classes.Array)
+const Array = require(shared.Classes.List.Array)
 -------------------------------------------------------------------------------------------------------------------------------
 --Services
 --const Service = require(shared.Services.Service)
@@ -30,8 +30,12 @@ end
 -------------------------------------------------------------------------------------------------------------------------------
 function module.Start()
 	--
-	local arr = Array(5)
-	print(arr)
+	local arr = Array.new(5)
+	arr:Insert(1)
+	arr:Insert(2)
+	arr:Insert(3)
+	arr:Insert(4)
+	arr:Clear()
 	--
 	return -1
 end

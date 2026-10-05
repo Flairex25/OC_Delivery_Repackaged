@@ -12,18 +12,19 @@ export type Signal<T...> = {
 	Previous: Connection<T...> | Signal<T...>,
 	Next: Connection<T...> | Signal<T...>,
 	Fire: (self: Signal<T...>, T...) -> (),
-	Connect: (self: Signal<T...>, func: (T...) -> ()) -> Connection<T...>,
+	Connect: <A>(self: Signal<T...>, func: (T...) -> (), ...A?) -> Connection<T...>,
 	Once: (self: Signal<T...>, func: (T...) -> ()) -> Connection<T...>,
 	Wait: (self: Signal<T...>) -> T...,
 	--
 }
 --
-export type Connection<T...> = {
+export type Connection<T...=(),A...=()> = {
 	--
 	Type: "Connection",
-	Previous: Connection<T...>,
-	Next: Connection<T...>,
+	Previous: Connection<T...,A...>,
+	Next: Connection<T...,A...>,
 	Once: boolean,
+	Args: {A},
 	Function: (T...) -> (),
 	Thread: thread,
 	Disconnect: (self: Connection<T...>) -> (),
@@ -47,30 +48,32 @@ function Constuctor<T...>()
 	return signal
 end
 ---------------------------------------------------------------------------------------
-function Signal.Connect<T...>(self: Signal<T...>, fn: (T...) -> ()): Connection<T...>
+function Signal.Connect<T...,A...>(self: Signal<T...>, fn: (T...) -> (),...:A): Connection<T...,A...>
 	local connection = (setmetatable({}, Connection) :: any) :: Connection<T...>
 	connection.Previous = self.Previous
 	connection.Next = self
 	connection.Once = false
+	connection.Args = {...}
 	connection.Function = fn
 	self.Previous.Next = connection
 	self.Previous = connection
 	return connection
 end
 --
-function Signal.Once<T...>(self: Signal<T...>, fn: (T...) -> ()): Connection<T...>
-	local connection = (setmetatable({}, Connection) :: any) :: Connection<T...>
+function Signal.Once<T...,A...>(self: Signal<T...>, fn: (T...) -> (), ...:A): Connection<T...,A...>
+	local connection = (setmetatable({}, Connection) :: any) :: Connection<T...,A...>
 	connection.Previous = self.Previous
 	connection.Next = self
 	connection.Once = true
+	connection.Args = {...}
 	connection.Function = fn
 	self.Previous.Next = connection
 	self.Previous = connection
 	return connection
 end
 --
-function Signal.Wait<T...>(self: Signal<T...>)
-	local connection = (setmetatable({}, Connection) :: any) :: Connection<T...>
+function Signal.Wait<T...,A...>(self: Signal<T...>)
+	local connection = (setmetatable({}, Connection) :: any) :: Connection<T...,A...>
 	connection.Previous = self.Previous
 	connection.Next = self
 	connection.Once = true
@@ -80,13 +83,13 @@ function Signal.Wait<T...>(self: Signal<T...>)
 	return coroutine.yield()
 end
 --
-function Signal.Fire<T...>(self: Signal<T...>, ...: T)
-	local connection = self.Next :: Connection<T>
+function Signal.Fire<T...,A...>(self: Signal<T...>, ...: T)
+	local connection = self.Next :: Connection<T...,A...>
 	while connection.Type == "Connection" do
 		if connection.Function then
-			TaskService:Defer(connection.Function, ...)
+			TaskService:Defer(connection.Function, ..., table.unpack(connection.Args))
 		else
-			TaskService:Defer(connection.Thread, ...)
+			TaskService:Defer(connection.Thread, ..., table.unpack(connection.Args))
 		end
 		if connection.Once then
 			connection.Previous.Next = connection.Next

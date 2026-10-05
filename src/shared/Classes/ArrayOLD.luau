@@ -13,9 +13,9 @@ export type Array<T> = {
 	Type: "Array",
 	--------------------
 	--Private
-	--Capacity: number,
-	--Size: number,
-	--Data: { T },
+	_Capacity: number,
+	_Size: number,
+	Data: { T },
 	--------------------
 	--Public
 	GetSize: (self: Array<T>) -> number,
@@ -44,22 +44,22 @@ Array.__index = Array
 const function Constructor<T>(size: number): Array<T>
 	local self = (setmetatable({}, Array) :: any) :: Array<T>
 	self.Data = {} :: { T }
-	self.Size = 0
-	self.Capacity = size or 1
+	self._Size = 0
+	self._Capacity = size or 1
 	return self
 end
 ---------------------------------------------------------------------------------------
 --Getters
 function Array.GetSize<T>(self: Array<T>): number
-	return self.Size
+	return self._Size
 end
 function Array.GetCapacity<T>(self: Array<T>): number
-	return self.Capacity
+	return self._Capacity
 end
 ---------------------------------------------------------------------------------------
 --Get
 function Array.Get<T>(self: Array<T>, index: number, range: number?): ...T?
-	if index < 1 or index > self.Size then
+	if index < 1 or index > self._Size then
 		warn("Index " .. index .. " out of bounds!")
 		return
 	end
@@ -69,7 +69,7 @@ function Array.Get<T>(self: Array<T>, index: number, range: number?): ...T?
 			return
 		end
 		local items: { T } = {}
-		for i = index, math.min(index + range - 1, self.Size) do
+		for i = index, math.min(index + range - 1, self._Size) do
 			table.insert(items, self.Data[i])
 		end
 		return table.unpack(items)
@@ -81,26 +81,26 @@ end
 function Array.Insert<T>(self: Array<T>, index: number | T, item: T?)
 	if not item then
 		item = index :: T
-		index = self.Size + 1
+		index = self._Size + 1
 	end
-	if index < 1 or index > self.Capacity then
+	if index < 1 or index > self._Capacity then
 		warn("Index " .. index .. " out of bounds!")
 		return
 	end
 	self.Data[index :: number] = item :: T
-	self.Size += 1
+	self._Size += 1
 end
 --Remove
 function Array.Remove<T>(self: Array<T>, index: number): T?
-	if index < 1 or index > self.Size then
+	if index < 1 or index > self._Size then
 		warn("Index " .. index .. " out of bounds!")
 		return
 	end
 	local item = self.Data[index]
-	for i = index, self.Size do
+	for i = index, self._Size do
 		self.Data[i] = self.Data[i + 1]
 	end
-	self.Size -= 1
+	self._Size -= 1
 	return item
 end
 --Find
@@ -115,13 +115,13 @@ function Array.Find<T>(self: Array<T>, item: T): ...number?
 end
 --IsEmpty
 function Array.IsEmpty<T>(self: Array<T>): boolean
-	return (self.Size == 0)
+	return (self._Size == 0)
 end
 ---------------------------------------------------------------------------------------
 --Sort
 function Array.Sort<T>(self: Array<T>, compareFunction: (a: T, b: T) -> boolean)
-	for _ = 1, self.Size do
-		for j = 1, self.Size - 1 do
+	for _ = 1, self._Size do
+		for j = 1, self._Size - 1 do
 			if compareFunction(self.Data[j + 1], self.Data[j]) then
 				self:Swap(j, j + 1)
 			end
@@ -133,22 +133,22 @@ end
 function Array.Emplace<T>(self: Array<T>, index: number | T, item: T?)
 	if not item then
 		item = index :: T
-		index = self.Size + 1
+		index = self._Size + 1
 	end
-	if index < 1 or index > self.Capacity + 1 then
+	if index < 1 or index > self._Capacity + 1 then
 		warn("Index " .. index .. " out of bounds!")
 		return
 	end
-	for i = self.Size, index, -1 do
+	for i = self._Size, index, -1 do
 		self.Data[i + 1] = self.Data[i]
 	end
 	self.Data[index :: number] = item :: T
-	self.Size += 1
-	self.Capacity = self.Size
+	self._Size += 1
+	self._Capacity = self._Size
 end
 --Swap
 function Array.Swap<T>(self: Array<T>, index1: number, index2: number)
-	if index1 < 1 or index1 > self.Size or index2 < 1 or index2 > self.Size then
+	if index1 < 1 or index1 > self._Size or index2 < 1 or index2 > self._Size then
 		warn("Index out of bounds!")
 		return
 	end
@@ -158,7 +158,7 @@ function Array.Swap<T>(self: Array<T>, index1: number, index2: number)
 end
 --Erase
 function Array.Erase<T>(self: Array<T>, index: number, range: number)
-	if index < 1 or index > self.Size then
+	if index < 1 or index > self._Size then
 		warn("Index out of bounds!")
 		return
 	end
@@ -166,7 +166,7 @@ function Array.Erase<T>(self: Array<T>, index: number, range: number)
 		warn("Range must be greater than 0!")
 		return
 	end
-	range = math.min(range, self.Size - index + 1)
+	range = math.min(range, self._Size - index + 1)
 	for i = index + range - 1, index, -1 do
 		self:Remove(i)
 	end
@@ -174,8 +174,8 @@ end
 --Clear
 function Array.Clear<T>(self: Array<T>)
 	self.Data = {}
-	self.Size = 0
-	self.Capacity = 1
+	self._Size = 0
+	self._Capacity = 1
 end
 ---------------------------------------------------------------------------------------
 --To String
@@ -183,7 +183,7 @@ function Array.__tostring<T>(self: Array<T>): string
 	local str = "{"
 	for i, v in ipairs(self.Data) do
 		str ..= tostring(v)
-		if i < self.Size then
+		if i < self._Size then
 			str ..= ", "
 		end
 	end
@@ -192,7 +192,7 @@ function Array.__tostring<T>(self: Array<T>): string
 end
 --Length
 function Array.__len<T>(self: Array<T>): number
-	return self.Size
+	return self._Size
 end
 ---------------------------------------------------------------------------------------
 return Constructor
